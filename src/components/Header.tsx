@@ -9,11 +9,15 @@ import { Link } from 'react-router-dom';
 
 export default function AppHeader() {
   const theme = useTheme();
+
+  // determine route to link to based on current signin
+  const allCafePath: string = (localStorage.getItem('authToken') === null) ? "/login" : "/allCafes"
+  
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" color={"primary"}>
         <Toolbar>
-          <Link to={"/allCafes"}><Button color="secondary">Explore Cafes</Button></Link>
+          <Link to={allCafePath}><Button color="secondary">Explore Cafes</Button></Link>
           <Typography variant="h6" color={theme.palette.primary.contrastText} component="div" sx={{ flexGrow: 1 }}>
             Boston Bean Scene
           </Typography>

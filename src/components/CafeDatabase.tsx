@@ -22,7 +22,7 @@ export function CafeDatabase() {
   }
 
   useEffect(()=>{
-      fetchPost();
+    fetchPost();
   }, [])
 
   console.log(data)
