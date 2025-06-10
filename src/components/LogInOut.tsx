@@ -5,19 +5,18 @@ import { Link } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
 
 export default function LogInOut(): React.ReactElement {
-    const [auth, setAuth] = React.useState<Auth>(getAuth());
-    const [loggedInUser, setLoggedInUser] = React.useState<User | undefined>(undefined);
-    const [open, setOpen] = React.useState<boolean>(false);
+    const [loggedIn, setLoggedIn] = React.useState<boolean>(false);
 
+    // On first render, initialize auth and set up a trigger to toggle loggedInUser
+    // from onAuthStateChanged, which listens for when the user logs in/out 
+    const auth: Auth = React.useMemo<Auth>(getAuth, []);
     React.useEffect(() => {
         onAuthStateChanged(auth, (user) => {
-            if (user) {
-                setLoggedInUser(user);
-            } else {
-                setLoggedInUser(undefined);
-            }
+            user ? setLoggedIn(true) : setLoggedIn(false)
         });
-    }, [auth]);
+    }, []);
+
+    const [open, setOpen] = React.useState<boolean>(false);
 
     // Handles event that user clicks "Log Out" button.
     function handleOpenLogOut() {
@@ -46,9 +45,9 @@ export default function LogInOut(): React.ReactElement {
     return (
         <div>
             {
-                (loggedInUser === undefined)
-                    ? <Link to={"/login"}><Button color="secondary">Log In</Button></Link>
-                    : <Button color="secondary" onClick={handleOpenLogOut}>Log Out</Button>
+                loggedIn
+                    ? <Button color="secondary" onClick={handleOpenLogOut}>Log Out</Button>
+                    : <Link to={"/login"}><Button color="secondary">Log In</Button></Link>
             }
             < Dialog open={open} onClose={handleCloseLogOut} >
                 <DialogTitle id="alert-dialog-title">
