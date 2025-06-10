@@ -6,13 +6,14 @@ import Typography from '@mui/material/Typography';
 import Button from '@mui/material/Button';
 import useTheme from '@mui/material/styles/useTheme';
 import { Link } from 'react-router-dom';
+import LogInOut from './LogInOut';
 
 export default function AppHeader() {
   const theme = useTheme();
 
   // determine route to link to based on current signin
   const allCafePath: string = (localStorage.getItem('authToken') === null) ? "/login" : "/allCafes"
-  
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="static" color={"primary"}>
@@ -21,6 +22,7 @@ export default function AppHeader() {
           <Typography variant="h6" color={theme.palette.primary.contrastText} component="div" sx={{ flexGrow: 1 }}>
             Boston Bean Scene
           </Typography>
+          <LogInOut></LogInOut>
           <Link to={"/about"}><Button color="secondary">About</Button></Link>
         </Toolbar>
       </AppBar>
