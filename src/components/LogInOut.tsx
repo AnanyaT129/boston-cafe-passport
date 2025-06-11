@@ -3,6 +3,8 @@ import { Auth, getAuth, User, onAuthStateChanged } from 'firebase/auth';
 import { Dialog, DialogTitle, DialogActions, Button } from '@mui/material';
 import { Link } from 'react-router-dom';
 import { signOut } from 'firebase/auth';
+import { ThemeProvider } from '@emotion/react';
+import { theme } from '../theme';
 
 export default function LogInOut(): React.ReactElement {
     const [loggedIn, setLoggedIn] = React.useState<boolean>(false);
@@ -43,13 +45,13 @@ export default function LogInOut(): React.ReactElement {
     }
 
     return (
-        <div>
+        <ThemeProvider theme={theme}>
             {
                 loggedIn
                     ? <Button color="secondary" onClick={handleOpenLogOut}>Log Out</Button>
                     : <Link to={"/login"}><Button color="secondary">Log In</Button></Link>
             }
-            < Dialog open={open} onClose={handleCloseLogOut} >
+            <Dialog open={open} onClose={handleCloseLogOut} >
                 <DialogTitle id="alert-dialog-title">
                     {"Log Out?"}
                 </DialogTitle>
@@ -58,6 +60,6 @@ export default function LogInOut(): React.ReactElement {
                     <Button onClick={handleConfirmLogOut}>Log Out</Button>
                 </DialogActions>
             </Dialog >
-        </div>
+        </ThemeProvider>
     )
 }

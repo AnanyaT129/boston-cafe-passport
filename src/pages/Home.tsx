@@ -1,6 +1,8 @@
 import React from 'react'
 import AppHeader from '../components/Header';
 import { InfoGrid, InfoType } from '../components/InfoGrid';
+import { ThemeProvider } from '@emotion/react';
+import { theme } from '../theme';
 
 function Home() {
   const homeGridInfo: InfoType[] = [
@@ -15,7 +17,7 @@ function Home() {
       description: "Get personalized recommendations on which cafe to visit.",
       actions: [
         {
-          link: "/",
+          link: "/recommendations",
           text: "I'm Ready"
         }
       ]
@@ -37,12 +39,14 @@ function Home() {
       alt: "Cafe Stock"
     }
   ]
-  
+
   return (
-    <div>
-      <AppHeader></AppHeader>
-      <InfoGrid info={homeGridInfo}></InfoGrid>
-    </div>
+    <ThemeProvider theme={theme}>
+      <div>
+        <AppHeader></AppHeader>
+        <InfoGrid info={homeGridInfo}></InfoGrid>
+      </div>
+    </ThemeProvider>
   )
 }
 
