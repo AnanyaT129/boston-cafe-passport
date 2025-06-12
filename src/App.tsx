@@ -1,10 +1,11 @@
 import React from 'react';
 import './App.css';
-import { ThemeProvider } from '@mui/material/styles';
-import { theme } from './theme';
+import { ThemeProvider, useTheme } from '@mui/material/styles';
 import Home from './pages/Home';
 
 function App() {
+  const theme = useTheme();
+  
   return (
     <div className="App">
       <ThemeProvider theme={theme}>
