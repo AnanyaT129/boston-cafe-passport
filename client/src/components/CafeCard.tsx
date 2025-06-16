@@ -16,8 +16,8 @@ export default function CafeCard(props: {cafe: Cafe}) {
         <CardMedia
           component="img"
           height="140"
-          image="/static/images/cards/contemplative-reptile.jpg"
-          alt="green iguana"
+          image={props.cafe.image}
+          alt={props.cafe.name}
         />
         <CardContent>
           <Typography gutterBottom variant="h5" component="div">

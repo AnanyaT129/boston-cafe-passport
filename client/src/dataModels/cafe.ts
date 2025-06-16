@@ -6,6 +6,7 @@ export type Cafe =  {
   address: Address,
   attributes: CafeAttributes
   website: string,
+  image: string,
 }
 
 export type Address = {
