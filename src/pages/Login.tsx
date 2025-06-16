@@ -5,9 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import { Container, TextField, Typography } from '@mui/material';
 import { getAuth, signInWithEmailAndPassword, UserCredential } from 'firebase/auth';
-import { firebaseApp } from '../configuration';
+import { db, firebaseApp } from '../configuration';
 import { ThemeProvider } from '@emotion/react';
 import { theme } from '../theme';
+import { doc, getDoc } from 'firebase/firestore';
 
 export default function Login () {
     const navigate = useNavigate();
@@ -26,6 +27,14 @@ export default function Login () {
             const idToken = await user.getIdToken();
             localStorage.setItem('authToken', idToken);
 
+            // save user email and name to local storage
+            const userData = await getDoc(doc(db, `users/${email}`))
+            if (userData.exists()) {
+              const ud = userData.data();
+              localStorage.setItem('userEmail', ud.email || '');
+              localStorage.setItem('userName', ud.name || '');
+            }
+
             navigate('/allCafes');
         } catch (error: unknown) {
             if (error instanceof Error) {
@@ -37,7 +46,7 @@ export default function Login () {
     return (
         <ThemeProvider theme={theme}>
             <AppHeader></AppHeader>
-            <Container>
+            <Container style={{marginTop: '3%'}}>
                 <Typography variant="h4" gutterBottom>
                     LOGIN
                 </Typography>
