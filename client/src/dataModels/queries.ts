@@ -34,3 +34,12 @@ export const GET_ALL_CAFES = gql`
     }
   }
 `;
+
+export const GET_USER = gql`
+  query Query($email: String) {
+    getUser(email: $email) {
+      email
+      name
+    }
+  }
+`;

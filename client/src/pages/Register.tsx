@@ -11,7 +11,9 @@ import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
 import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import { theme } from '../theme';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, setDoc } from 'firebase/firestore';
+import { GET_USER } from '../dataModels/queries';
+import client from '../apolloClient';
 
 export default function Register() {
     // State for email, password, error message, and loading status
@@ -37,23 +39,32 @@ export default function Register() {
       setError('');
 
       try {
-          // Try logging in first
-          const userCredential: UserCredential = await signInWithEmailAndPassword(auth, email, password);
-          alert('Account already exists. You are logged in!');
-          
-          const user = userCredential.user;
-          const idToken = await user.getIdToken();
-          localStorage.setItem('authToken', idToken);
+        // Try logging in first
+        const userCredential: UserCredential = await signInWithEmailAndPassword(auth, email, password);
+        alert('Account already exists. You are logged in!');
+        
+        const user = userCredential.user;
+        const idToken = await user.getIdToken();
+        localStorage.setItem('authToken', idToken);
 
-          // save user email and name to local storage
-          const userData = await getDoc(doc(db, `users/${email}`))
-          if (userData.exists()) {
-            const ud = userData.data();
-            localStorage.setItem('userEmail', ud.email || '');
-            localStorage.setItem('userName', ud.name || '');
-          }
+        // save user email and name to local storage
+        const { data } = await client.query({
+          query: GET_USER,
+          variables: { id: user.uid },
+          context: {
+            headers: {
+              Authorization: `Bearer ${idToken}`,
+            },
+          },
+        });
 
-          navigate('/allCafes');
+        if (data && data.getUser) {
+          const ud = data.getUser;
+          localStorage.setItem('userEmail', ud.email || '');
+          localStorage.setItem('userName', ud.name || '');
+        }
+
+        navigate('/allCafes');
       } catch (loginError) {
           if (loginError instanceof FirebaseError) {
               // If login fails, create a new account

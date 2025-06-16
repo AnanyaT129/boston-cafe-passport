@@ -14,6 +14,10 @@ type Query {
     time: TimeInput
     tags: TagInput
   ): [Cafe!]!
+
+  getUser(
+    email: String
+  ): User
 }
 
 type Cafe {
@@ -54,6 +58,11 @@ type Tag {
 type Time {
   opening: String
   closing: String
+}
+
+type User {
+  name: String
+  email: String
 }
 
 input TimeInput {
