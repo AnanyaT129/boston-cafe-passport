@@ -19,13 +19,13 @@ export default function AppHeader() {
       <AppBar position="static" color={"primary"}>
         <Toolbar>
           <Link to={allCafePath} color="secondary"><Button color="secondary">Explore Cafes</Button></Link>
-          <Link to={"/"} style={{ flexGrow: 1, textDecoration: 'none' }}>
+          <Link to={"/"} style={{ flexGrow: 1, textDecoration: 'none', textAlign: 'center'}}>
             <Typography variant="h6" color={theme.palette.primary.contrastText} component="div" sx={{ flexGrow: 1 }}>
               Boston Bean Scene
             </Typography>
           </Link>
-          <LogInOut></LogInOut>
           <Link to={"/about"}><Button color="secondary">About</Button></Link>
+          <LogInOut></LogInOut>
         </Toolbar>
       </AppBar>
     </Box>
