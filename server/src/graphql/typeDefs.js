@@ -6,7 +6,7 @@ type Query {
     name: String
     distance: Int
     rating: Int
-    price: Float
+    price: String
     hasInternet: Boolean
     hasOutlets: Int
     timeLimit: Int
@@ -37,7 +37,7 @@ type Geopoint {
 
 type CafeAttributes {
   rating: Int
-  price: Float
+  price: String
   hasInternet: Boolean
   hasOutlets: Int
   timeLimit: Int

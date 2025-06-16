@@ -1,6 +1,12 @@
+const { db } = require('../../firebase');
+
 const resolvers = {
   Query: {
-    getAllCafes: (_, args) => {
+    getAllCafes: async (_, args, context) => {
+      if (!context.uid) {
+        throw new Error('Not authenticated');
+      }
+
       // Destructure filtering parameters from args
       const {
         name,
@@ -15,12 +21,13 @@ const resolvers = {
         tags,
       } = args;
 
-      const cafes = []
+      const cafesRef = db.collection('cafes');
+      const snapshot = await cafesRef.get();
 
-      // Apply filters to the sets array
-      return cafes.filter((cafe) => {
-        return true
-      });
+      const cafes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+      // Apply filters to the cafes array
+      return cafes
     },
   }
 }

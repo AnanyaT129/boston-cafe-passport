@@ -9,6 +9,9 @@ services:
       - ./server:/app
     environment:
       - NODE_ENV=development
+      - FIREBASE_SERVICE_ACCOUNT=${FIREBASE_SERVICE_ACCOUNT}
+    env_file:
+      - .env
 
   client:
     build: ./client
