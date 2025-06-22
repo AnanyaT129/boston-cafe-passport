@@ -26,3 +26,5 @@
 client/scripts/credentials.json
 client/scripts/cafeDataAsJSON.json
 client/scripts/cafeDataInput.csv
+firebase-service-account.json
+server/convert-service-account.js

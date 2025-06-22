@@ -1,35 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import {db} from '../configuration';
-import { Cafe } from "../dataModels/cafe"
+import React from "react";
 import CafeGrid from "./CafeGrid";
-
-// App.js 
+import { useQuery } from "@apollo/client";
+import { GET_ALL_CAFES } from "../dataModels/queries";
 
 export function CafeDatabase() {
-  const [data, setData] = useState(Array<Cafe>);
+  const { loading, error, data } = useQuery(GET_ALL_CAFES);
 
-  const fetchPost = async () => {
+  console.log('Data from query:', data);
 
-    await getDocs(collection(db, "cafes"))
-        .then((querySnapshot: { docs: any[]; })=>{               
-            const newData = querySnapshot.docs
-                .map((doc) => ({...doc.data(), id:doc.id }));
-                setData(newData);                
-            console.log(newData);
-        })
-
-  }
-
-  useEffect(()=>{
-    fetchPost();
-  }, [])
-
-  console.log(data)
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
 
   return (
     <div>
-      <CafeGrid listOfCafes={data}></CafeGrid>
+      <CafeGrid listOfCafes={data?.getAllCafes || []}></CafeGrid>
     </div>
   );
 }

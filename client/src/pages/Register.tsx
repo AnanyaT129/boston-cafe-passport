@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import 'firebase/auth';  // Firebase Authentication
 import Header from '../components/Header';
 import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, UserCredential } from 'firebase/auth';
-import { db, firebaseApp } from '../configuration';
+import { firebaseApp } from '../configuration';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import { FirebaseError } from 'firebase/app';
@@ -11,7 +11,8 @@ import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
 import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import { theme } from '../theme';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { GET_USER, SET_NEW_USER } from '../dataModels/queries';
+import client from '../apolloClient';
 
 export default function Register() {
     // State for email, password, error message, and loading status
@@ -37,55 +38,54 @@ export default function Register() {
       setError('');
 
       try {
-          // Try logging in first
-          const userCredential: UserCredential = await signInWithEmailAndPassword(auth, email, password);
-          alert('Account already exists. You are logged in!');
-          
-          const user = userCredential.user;
-          const idToken = await user.getIdToken();
-          localStorage.setItem('authToken', idToken);
+        // 1. Create user
+        const userCredential: UserCredential = await createUserWithEmailAndPassword(auth, email, password);
+        alert('Account created successfully!');
 
-          // save user email and name to local storage
-          const userData = await getDoc(doc(db, `users/${email}`))
-          if (userData.exists()) {
-            const ud = userData.data();
-            localStorage.setItem('userEmail', ud.email || '');
-            localStorage.setItem('userName', ud.name || '');
+        const user = userCredential.user;
+        const idToken = await user.getIdToken();
+        localStorage.setItem('authToken', idToken);
+
+        // 2. Save user info in backend via GraphQL
+        const { data } = await client.mutate({
+          mutation: SET_NEW_USER,
+          variables: { name, email },
+          context: {
+            headers: {
+              Authorization: `Bearer ${idToken}`,
+            },
+          },
+        });
+
+        localStorage.setItem('userEmail', data?.setNewUser?.email ? email : '');
+        localStorage.setItem('userName', data?.setNewUser?.name || '');
+
+        // 3. Redirect
+        navigate('/allCafes');
+      } catch (error) {
+        if (error instanceof FirebaseError) {
+          if (error.code === 'auth/email-already-in-use') {
+            setError('An account with this email already exists. Please log in.');
+          } else {
+            setError(error.message);
           }
+        } else {
+          setError('An unknown error occurred.');
+        }
 
-          navigate('/allCafes');
-      } catch (loginError) {
-          if (loginError instanceof FirebaseError) {
-              // If login fails, create a new account
-              if (loginError.code === 'auth/user-not-found' || loginError.code === 'auth/invalid-credential') {
-                  try {
-                      const userCredential: UserCredential = await createUserWithEmailAndPassword(auth, email, password);
-                      alert('Account created successfully!');
-                      const user = userCredential.user;
-                      const idToken = await user.getIdToken();
-                      localStorage.setItem('authToken', idToken);
-
-                      // write new user to the user collection
-                      await setDoc(doc(db, 'users', email), {
-                        id: idToken,
-                        name: name || 'Sample Name', // default to empty string if no displayName
-                        email: email
-                      });
-
-                      localStorage.setItem('userEmail', email || '');
-                      localStorage.setItem('userName', name || '');
-
-                      navigate('/allCafes');
-                  } catch (registerError) {
-                      if (registerError instanceof FirebaseError) {
-                          setError(registerError.message); // Display error message if account creation fails
-                      }
-                  }
-              } else {
-                  setError(loginError.message); // Display login error if not due to user not found
-              }
+        const currentUser = auth.currentUser;
+        if (currentUser) {
+          try {
+            await currentUser.delete();
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('userEmail');
+            localStorage.removeItem('userName')
+          } catch (deleteError) {
+            console.error('Failed to clean up Firebase user after failed registration:', deleteError);
           }
+        }
       }
+
       setLoading(false);
     };
 
@@ -135,8 +135,9 @@ export default function Register() {
                         placeholder="Confirm Password"
                         value={confirmPassword}
                         onChange={(e) => {
-                          setConfirmPassword(e.target.value)
-                          setPasswordMatch(confirmPassword !== '' && confirmPassword !== password)
+                          const value = e.target.value;
+                          setConfirmPassword(value);
+                          setPasswordMatch(value === password);
                         }}
                         fullWidth
                         required

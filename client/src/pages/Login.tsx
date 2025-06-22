@@ -5,10 +5,11 @@ import { useNavigate } from 'react-router-dom';
 import Button from '@mui/material/Button';
 import { Container, TextField, Typography } from '@mui/material';
 import { getAuth, signInWithEmailAndPassword, UserCredential } from 'firebase/auth';
-import { db, firebaseApp } from '../configuration';
+import { firebaseApp } from '../configuration';
 import { ThemeProvider } from '@emotion/react';
 import { theme } from '../theme';
-import { doc, getDoc } from 'firebase/firestore';
+import { GET_USER } from '../dataModels/queries';
+import client from '../apolloClient';
 
 export default function Login () {
     const navigate = useNavigate();
@@ -20,27 +21,35 @@ export default function Login () {
     const auth = getAuth(firebaseApp);
 
     const handleLogin = async (): Promise<void> => {
-        try {
-            const userCredential: UserCredential = await signInWithEmailAndPassword(auth, email, password);
-            // Store the token for the session
-            const user = userCredential.user;
-            const idToken = await user.getIdToken();
-            localStorage.setItem('authToken', idToken);
+      try {
+          const userCredential: UserCredential = await signInWithEmailAndPassword(auth, email, password);
+          // Store the token for the session
+          const user = userCredential.user;
+          const idToken = await user.getIdToken();
+          localStorage.setItem('authToken', idToken);
 
-            // save user email and name to local storage
-            const userData = await getDoc(doc(db, `users/${email}`))
-            if (userData.exists()) {
-              const ud = userData.data();
-              localStorage.setItem('userEmail', ud.email || '');
-              localStorage.setItem('userName', ud.name || '');
-            }
+          const { data } = await client.query({
+            query: GET_USER,
+            variables: { email: user.email },
+            context: {
+              headers: {
+                Authorization: `Bearer ${idToken}`,
+              },
+            },
+          });
 
-            navigate('/allCafes');
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                setError(error.message);
-            }
-        }
+          if (data && data.getUser) {
+            const ud = data.getUser;
+            localStorage.setItem('userEmail', email || '');
+            localStorage.setItem('userName', ud.name || '');
+          }
+
+          navigate('/allCafes');
+      } catch (error: unknown) {
+          if (error instanceof Error) {
+              setError(error.message);
+          }
+      }
     };
 
     return (

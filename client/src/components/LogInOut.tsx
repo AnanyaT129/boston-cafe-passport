@@ -40,6 +40,8 @@ export default function LogInOut(): React.ReactElement {
     function logOut() {
         signOut(auth);
         localStorage.removeItem('authToken');
+        localStorage.removeItem('userEmail');
+        localStorage.removeItem('userName')
         navigate("/")
     }
 

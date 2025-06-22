@@ -6,7 +6,7 @@ type Query {
     name: String
     distance: Int
     rating: Int
-    price: Float
+    price: String
     hasInternet: Boolean
     hasOutlets: Int
     timeLimit: Int
@@ -14,6 +14,17 @@ type Query {
     time: TimeInput
     tags: TagInput
   ): [Cafe!]!
+
+  getUser(
+    email: String
+  ): User
+}
+
+type Mutation {
+  setNewUser(
+    name: String,
+    email: String
+  ): User
 }
 
 type Cafe {
@@ -37,7 +48,7 @@ type Geopoint {
 
 type CafeAttributes {
   rating: Int
-  price: Float
+  price: String
   hasInternet: Boolean
   hasOutlets: Int
   timeLimit: Int
@@ -54,6 +65,12 @@ type Tag {
 type Time {
   opening: String
   closing: String
+}
+
+type User {
+  name: String
+  email: String
+  createdAt: String
 }
 
 input TimeInput {

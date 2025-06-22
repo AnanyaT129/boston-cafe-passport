@@ -11,6 +11,8 @@ import AllCafes from './pages/AllCafes';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
+import client from './apolloClient';
+import { ApolloProvider } from '@apollo/client';
 
 const router = createBrowserRouter([
   {
@@ -43,7 +45,9 @@ const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
-  <React.StrictMode>
-    <RouterProvider router={router} />
-  </React.StrictMode>
+  <ApolloProvider client={client}>
+    <React.StrictMode>
+      <RouterProvider router={router} />
+    </React.StrictMode>
+  </ApolloProvider>
 );
