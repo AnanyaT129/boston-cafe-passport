@@ -36,16 +36,43 @@ const resolvers = {
       }
 
       const {email} = args;
+      const safeEmailId = encodeURIComponent(email);
 
-      const usersRef = db.collection('users');
-      const snapshot = await usersRef.get()
+      const usersRef = db.collection('users').doc(safeEmailId);
+      const user = await usersRef.get();
 
-      if (snapshot.docs.length === 0) {
+      if (!user.exists) {
         throw new Error('User not found')
       }
 
-      const user = snapshot.docs.map(doc => doc.data()).at(0)
-      return user
+      return user.data()
+    }
+  },
+  Mutation: {
+    setNewUser: async (_, args, context) => {
+      if (!context.uid) {
+        throw new Error('Not authenticated')
+      }
+
+      const { name, email } = args;
+
+      const safeEmailId = encodeURIComponent(email);
+      const userRef = db.collection('users').doc(safeEmailId);
+      const existingUser = await userRef.get();
+
+      if (existingUser.exists) {
+        throw new Error('User already exists');
+      }
+
+      const newUser = {
+        name: name,
+        email: safeEmailId,
+        createdAt: new Date().toISOString()
+      };
+
+      await userRef.set(newUser);
+
+      return newUser;
     }
   }
 }

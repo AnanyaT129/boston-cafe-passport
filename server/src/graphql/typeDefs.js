@@ -20,6 +20,13 @@ type Query {
   ): User
 }
 
+type Mutation {
+  setNewUser(
+    name: String,
+    email: String
+  ): User
+}
+
 type Cafe {
   id: String
   name: String
@@ -63,6 +70,7 @@ type Time {
 type User {
   name: String
   email: String
+  createdAt: String
 }
 
 input TimeInput {

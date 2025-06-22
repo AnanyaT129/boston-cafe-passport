@@ -43,3 +43,13 @@ export const GET_USER = gql`
     }
   }
 `;
+
+export const SET_NEW_USER = gql`
+  mutation SetNewUser($name: String, $email: String) {
+    setNewUser(name: $name, email: $email) {
+      createdAt
+      email
+      name
+    }
+  }
+`

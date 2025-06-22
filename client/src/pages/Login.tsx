@@ -30,7 +30,7 @@ export default function Login () {
 
           const { data } = await client.query({
             query: GET_USER,
-            variables: { id: user.uid },
+            variables: { email: user.email },
             context: {
               headers: {
                 Authorization: `Bearer ${idToken}`,
@@ -40,7 +40,7 @@ export default function Login () {
 
           if (data && data.getUser) {
             const ud = data.getUser;
-            localStorage.setItem('userEmail', ud.email || '');
+            localStorage.setItem('userEmail', email || '');
             localStorage.setItem('userName', ud.name || '');
           }
 
