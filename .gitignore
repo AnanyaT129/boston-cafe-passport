@@ -25,3 +25,4 @@ yarn-error.log*
 scripts/credentials.json
 scripts/cafeDataAsJSON.json
 scripts/cafeDataInput.csv
+scripts/bostoncoffeepassport*
